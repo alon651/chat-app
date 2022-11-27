@@ -93,9 +93,7 @@ app.get("/verifyLogin", (req, res) => {
 });
 function insertChat(user1, user2, res) {
     db.query(
-        "INSERT INTO chat (user1_id,user2_id) VALUES \
-        ((SELECT id FROM users WHERE username=?),\
-        (SELECT id FROM users WHERE username=?))",
+        "INSERT INTO chat (user1_id,user2_id) VALUES (?,?)",
         [user1, user2],
         (err2, result2) => {
             if (err2) {
@@ -111,11 +109,7 @@ app.post("/addChat", (req, res) => {
     const user2 = req.body.user2;
     console.log(`chat created between ${user1} and ${user2}`);
     const sqlQuery =
-        "SELECT COUNT(id) AS ChatCount FROM chat WHERE \
-        (user1_id=(SELECT id FROM users WHERE username=?) AND \
-        user2_id=(SELECT id FROM users WHERE username=?)) OR\
-        (user1_id=(SELECT id FROM users WHERE username=?) AND\
-        user2_id=(SELECT id FROM users WHERE username=?))";
+        "SELECT COUNT(id) AS ChatCount FROM chat WHERE (user1_id=? AND user2_id=?) OR  (user1_id=? AND user2_id=?)";
     db.query(sqlQuery, [user1, user2, user2, user1], (err, result) => {
         if (err) {
             console.log(err);
@@ -132,8 +126,8 @@ app.get("/allChats", (req, res) => {
     db.query(
         "SELECT u1.username as u1name,u2.username as u2name,c.id as id FROM chatapp.chat c JOIN users u1 ON \
         u1.id=c.user1_id JOIN users u2 ON u2.id=c.user2_id WHERE \
-        c.user1_id=(SELECT id FROM users u WHERE u.username=?) OR \
-		c.user2_id=(SELECT id FROM users u WHERE u.username=?)",
+        c.user1_id=? OR \
+		c.user2_id=?",
         [user, user],
         (err, result) => {
             if (err) {
@@ -159,7 +153,7 @@ app.get("/getId", (req, res) => {
             } else {
                 console.log("getId result");
                 console.log(result[0]);
-                res.send(result[0]);
+                res.send(result[0].id);
             }
         }
     );

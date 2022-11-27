@@ -10,16 +10,16 @@ function App() {
             console.log(`connect_error due to ${err.message}`);
         });
     }, []);
-    const [curUser, setCurUser] = useState("none");
-    const value = [curUser, setCurUser];
+    const [curId, setCurId] = useState(0);
+    const value = [curId, setCurId];
     const navigate = useNavigate();
     // const curUser = useContext(userContext);
     let userMsg;
     const logout = () => {
-        setCurUser("none");
+        setCurId(0);
         navigate("/");
     };
-    if (curUser === "none") {
+    if (curId === 0) {
         userMsg = (
             <div className="userBtn">
                 <Link to="/register" className="userInfo">
@@ -33,7 +33,7 @@ function App() {
     } else {
         userMsg = (
             <div className="userBtn">
-                hello {curUser}
+                hello user number {curId}
                 <div onClick={logout}>logout</div>
             </div>
         );

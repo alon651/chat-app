@@ -8,57 +8,55 @@ export default function ChatAddForm() {
 
     const [chats, setChats] = useState([]);
     const [username, setUserName] = useState("");
-    const [curUser, setCurUser] = useContext(userContext);
+    const [curId, setCurId] = useContext(userContext);
     const [selectedId, setSelectedId] = useState(-1);
     let i = 0;
-    const [id, setId] = useState(0);
     const newChat = () => {
         axios
-            .post("http://localhost:3001/addChat", {
-                user1: curUser,
-                user2: username,
+            .get("http://localhost:3001/getId", {
+                params: { username: username },
             })
-            .then((response) => {
-                if (response.data === "success") {
-                    // console.log("chat Created");
-                    axios
-                        .get("http://localhost:3001/allChats", {
-                            params: { user: curUser },
-                        })
-                        .then((response) => {
-                            // response.data.result.map((r) => console.log(`chat:${r}\n`));
-                            // console.log(response.data.result);
-                            setChats(response.data.result);
-                        });
-                } else {
-                    if ((response.data = "error")) {
-                        console.log("user couldn't be found");
-                    }
-                }
-                // console.log(response.data);
+            .then((r) => {
+                const id2 = r.data;
+                axios
+                    .post("http://localhost:3001/addChat", {
+                        user1: curId,
+                        user2: id2,
+                    })
+                    .then((response) => {
+                        if (response.data === "success") {
+                            // console.log("chat Created");
+                            axios
+                                .get("http://localhost:3001/allChats", {
+                                    params: { user: curId },
+                                })
+                                .then((response2) => {
+                                    // response.data.result.map((r) => console.log(`chat:${r}\n`));
+                                    // console.log(response.data.result);
+                                    setChats(response2.data.result);
+                                });
+                        } else {
+                            if ((response.data = "error")) {
+                                console.log("user couldn't be found");
+                            }
+                        }
+                        // console.log(response.data);
+                    });
             });
     };
     useEffect(() => {
         // console.log("hello");
-        if (curUser === "none") navigate("/");
+        if (curId === 0) navigate("/");
         else
             axios
                 .get("http://localhost:3001/allChats", {
-                    params: { user: curUser },
+                    params: { user: curId },
                 })
                 .then((response) => {
                     // response.data.result.map((r) => console.log(`chat:${r}\n`));
                     // if(response.data)
                     // console.log(response.data.result);
                     setChats(response.data.result);
-                    axios
-                        .get("http://localhost:3001/getId", {
-                            params: { user: curUser },
-                        })
-                        .then((response2) => {
-                            // console.log(response2.data);
-                            setId(parseInt(response2.data));
-                        });
                 });
     }, []);
     return (
@@ -78,8 +76,7 @@ export default function ChatAddForm() {
                                 setSelectedId(r.id);
                             }}
                         >
-                            chat with{" "}
-                            {r.u1name === curUser ? r.u2name : r.u1name}
+                            chat with {r.u1name === curId ? r.u2name : r.u1name}
                         </div>
                     ))}
                     <div className="newchatForm">
@@ -93,7 +90,7 @@ export default function ChatAddForm() {
                         <div
                             className="newChatBtn"
                             onClick={() => {
-                                if (username !== curUser) newChat();
+                                if (username !== curId) newChat();
                             }}
                         >
                             +

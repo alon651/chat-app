@@ -75,14 +75,14 @@ app.get("/verifyLogin", (req, res) => {
     const username = req.query.username;
     const password = req.query.password;
     db.query(
-        "SELECT password FROM users WHERE username=?",
+        "SELECT id,password FROM users WHERE username=?",
         [username],
         (err, result) => {
             if (err) {
                 console.log(err);
             } else {
                 if (password === result[0].password) {
-                    res.send("success");
+                    res.send(String(result[0].id));
                 } else {
                     res.send("failure");
                 }
@@ -124,11 +124,17 @@ app.post("/addChat", (req, res) => {
 app.get("/allChats", (req, res) => {
     const user = req.query.user;
     db.query(
-        "SELECT u1.username as u1name,u2.username as u2name,c.id as id FROM chatapp.chat c JOIN users u1 ON \
-        u1.id=c.user1_id JOIN users u2 ON u2.id=c.user2_id WHERE \
-        c.user1_id=? OR \
-		c.user2_id=?",
-        [user, user],
+        "select c.id as chat_id, u.username as otherUser \
+        from chat c \
+        join users u on u.id=c.user2_id \
+        where c.user1_id=? \
+        union\
+        select c.id as chat_id, u.username as otherUser \
+        from chat c \
+        join users u on u.id=c.user1_id \
+        where c.user2_id=? \
+        Order by chat_id",
+        [(user, user)],
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -151,24 +157,28 @@ app.get("/getId", (req, res) => {
                 console.log(err);
                 res.send("error");
             } else {
-                console.log("getId result");
-                console.log(result[0]);
-                res.send(result[0].id);
+                if (result[0] != undefined) {
+                    console.log("getId result");
+                    console.log(result[0]);
+                    res.send(String(result[0].id));
+                } else {
+                    res.send("no results");
+                }
             }
         }
     );
 });
 
-// app.get("/getUname", (req, res) => {
-//     const id = req.query.id;
-//     db.query("SELECT username FROM users WHERE id=?", [id], (err, result) => {
-//         if (err) {
-//             console.log(err);
-//         } else {
-//             res.send(String(result[0].username));
-//         }
-//     });
-// });
+app.get("/getUname", (req, res) => {
+    const id = req.query.id;
+    db.query("SELECT username FROM users WHERE id=?", [id], (err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.send(String(result[0].username));
+        }
+    });
+});
 app.get("/chatDetails", (req, res) => {
     const chatId = req.query.id;
     db.query(

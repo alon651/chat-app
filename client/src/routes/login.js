@@ -8,7 +8,7 @@ export default function Login() {
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
     const [loginErr, setLoginErr] = useState(false);
-    const [curUser, setCurUser] = useContext(userContext);
+    const [curId, setCurId] = useContext(userContext);
     const navigate = useNavigate();
     // console.log(curUser);
     const logIn = () => {
@@ -18,11 +18,11 @@ export default function Login() {
             })
             .then((response) => {
                 console.log(response.data);
-                if (response.data === "success") {
+                if (response.data !== "failure") {
                     console.log("success");
-                    setCurUser(userName);
+                    setCurId(response.data);
                     setLoginErr(false);
-                    socket.auth = { curUser };
+                    socket.auth = { curId };
                     socket.connect();
                     navigate("/chats");
                 } else {

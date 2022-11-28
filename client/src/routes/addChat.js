@@ -17,31 +17,33 @@ export default function ChatAddForm() {
                 params: { username: username },
             })
             .then((r) => {
-                const id2 = r.data;
-                axios
-                    .post("http://localhost:3001/addChat", {
-                        user1: curId,
-                        user2: id2,
-                    })
-                    .then((response) => {
-                        if (response.data === "success") {
-                            // console.log("chat Created");
-                            axios
-                                .get("http://localhost:3001/allChats", {
-                                    params: { user: curId },
-                                })
-                                .then((response2) => {
-                                    // response.data.result.map((r) => console.log(`chat:${r}\n`));
-                                    // console.log(response.data.result);
-                                    setChats(response2.data.result);
-                                });
-                        } else {
-                            if ((response.data = "error")) {
-                                console.log("user couldn't be found");
+                if (r.data != "no results") {
+                    const id2 = r.data;
+                    axios
+                        .post("http://localhost:3001/addChat", {
+                            user1: curId,
+                            user2: id2,
+                        })
+                        .then((response) => {
+                            if (response.data === "success") {
+                                // console.log("chat Created");
+                                axios
+                                    .get("http://localhost:3001/allChats", {
+                                        params: { user: curId },
+                                    })
+                                    .then((response2) => {
+                                        // response.data.result.map((r) => console.log(`chat:${r}\n`));
+                                        // console.log(response.data.result);
+                                        setChats(response2.data.result);
+                                    });
+                            } else {
+                                if ((response.data = "error")) {
+                                    console.log("user couldn't be found");
+                                }
                             }
-                        }
-                        // console.log(response.data);
-                    });
+                            // console.log(response.data);
+                        });
+                }
             });
     };
     useEffect(() => {
@@ -65,18 +67,18 @@ export default function ChatAddForm() {
                 <div className="chatListContainer">
                     {chats.map((r) => (
                         <div
-                            key={r.id}
+                            key={r.chat_id}
                             className={
-                                selectedId === r.id
+                                selectedId === r.chat_id
                                     ? "singleChatContainer selected"
                                     : "singleChatContainer"
                             }
                             onClick={() => {
-                                navigate(`${r.id}`);
-                                setSelectedId(r.id);
+                                navigate(`${r.chat_id}`);
+                                setSelectedId(r.chat_id);
                             }}
                         >
-                            chat with {r.u1name === curId ? r.u2name : r.u1name}
+                            chat with {r.otherUser}
                         </div>
                     ))}
                     <div className="newchatForm">

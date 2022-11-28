@@ -5,7 +5,7 @@ import { userContext } from "../App.js";
 import { useNavigate } from "react-router-dom";
 
 export default function Register() {
-    const [curUser, setCurUser] = useContext(userContext);
+    const [curId, setCurId] = useContext(userContext);
     const navigate = useNavigate();
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
@@ -31,7 +31,14 @@ export default function Register() {
             })
             // .then(console.log(`user - ${userName} was registered`));
             .then(() => {
-                setCurUser(userName);
+                axios
+                    .get("http://localhost:3001/getId", {
+                        params: { username: userName },
+                    })
+                    .then((r) => {
+                        setCurId(r.data);
+                    });
+
                 navigate("/chats");
             });
     };

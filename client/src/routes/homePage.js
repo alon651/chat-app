@@ -5,10 +5,10 @@ import "../styles/homePage.css";
 import NewChatComponent from "./addChat.js";
 
 export default function HomePage() {
-    const [curUser, setCurUser] = useContext(userContext);
+    const [curId, setCurId] = useContext(userContext);
 
     let msg;
-    if (curUser === "none") {
+    if (curId === 0) {
         // if (false) {
 
         msg = (

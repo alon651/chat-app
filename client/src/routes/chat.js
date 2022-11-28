@@ -8,50 +8,43 @@ import { v4 as uuidv4 } from "uuid";
 export default function Chat() {
     const params = useParams();
     const chatId = params.chatId;
-    const [curUser, setCurUser] = useContext(userContext);
-    const [curId, setCurId] = useState();
+    const [curId, setCurId] = useContext(userContext);
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState("");
     const [user2_id, setUser2_id] = useState(11);
     const [tmpMessages, settmpMessages] = useState([]);
     // console.log(chatId);
     useEffect(() => {
-        console.log(curUser);
         axios
-            .get("http://localhost:3001/getId", {
-                params: { username: curUser },
+            .get("http://localhost:3001/chatDetails", {
+                params: {
+                    id: chatId,
+                },
             })
-            .then((r) => {
-                console.log(r);
-                setCurId(r.data.id);
-                console.log("id: ", curId);
+            .then((response) => {
+                // console.log(response.data);
+                setMessages(response.data);
                 axios
-                    .get("http://localhost:3001/chatDetails", {
-                        params: {
-                            id: chatId,
-                        },
+                    .get("http://localhost:3001/usersInChat", {
+                        params: { chat_id: chatId },
                     })
-                    .then((response) => {
-                        // console.log(response.data);
-                        setMessages(response.data);
-                        axios
-                            .get("http://localhost:3001/usersInChat", {
-                                params: { chat_id: chatId },
-                            })
-                            .then((response2) => {
-                                response2.data.user1_id === curId
-                                    ? setUser2_id(response2.data.user2_id)
-                                    : setUser2_id(response2.data.user1_id);
-                                // settmpMessages([]);
-                            });
+                    .then((response2) => {
+                        response2.data.user1_id === curId
+                            ? setUser2_id(response2.data.user2_id)
+                            : setUser2_id(response2.data.user1_id);
+                        // settmpMessages([]);
                     });
             });
-        socket.on("receive-message", (msg) => {
+    });
+    socket.on(
+        "receive-message",
+        (msg) => {
             receiveMessage(msg);
-        });
-        socket.emit("join-room", chatId);
-        console.log("joined room");
-    }, [chatId]);
+            socket.emit("join-room", chatId);
+            console.log("joined room");
+        },
+        [chatId]
+    );
     const sendMsg = () => {
         axios
             .post("http://localhost:3001/sendMessage", {

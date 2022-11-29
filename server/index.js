@@ -98,6 +98,7 @@ app.get("/verifyLogin", (req, res) => {
     );
 });
 function insertChat(user1, user2, res) {
+    if (user1 === user2) res.send("failure");
     db.query(
         "INSERT INTO chat (user1_id,user2_id) VALUES (?,?)",
         [user1, user2],

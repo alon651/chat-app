@@ -24,9 +24,15 @@ io.on("connection", (socket) => {
     });
 
     socket.on("join-room", (room) => {
-        [...socket.rooms].map((r) => socket.leave(r));
+        // [...socket.rooms].map((r) => socket.leave(r));
+        // if (socket.rooms.size > 1)
+        //     socket.leave([...socket.rooms][socket.rooms.size - 1]);
+        socket.leave([...socket.rooms][socket.rooms.size - 1]);
         socket.join(room);
-        console.log("rooms ", room);
+        console.log("rooms ", socket.rooms);
+    });
+    socket.on("get-rooms", () => {
+        socket.emit("print", socket.rooms);
     });
 });
 
@@ -124,7 +130,7 @@ app.post("/addChat", (req, res) => {
 app.get("/allChats", (req, res) => {
     const user = req.query.user;
     db.query(
-        "select c.id as chat_id, u.username as otherUser \
+        "select c.id as chat_id, u.username as otherUser\
         from chat c \
         join users u on u.id=c.user2_id \
         where c.user1_id=? \
@@ -134,7 +140,7 @@ app.get("/allChats", (req, res) => {
         join users u on u.id=c.user1_id \
         where c.user2_id=? \
         Order by chat_id",
-        [(user, user)],
+        [user, user],
         (err, result) => {
             if (err) {
                 console.log(err);

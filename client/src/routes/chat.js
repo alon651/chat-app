@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { userContext } from "../App";
 import axios from "axios";
 import socket from "../socket";
@@ -13,8 +13,12 @@ export default function Chat() {
     const [message, setMessage] = useState("");
     const [user2_id, setUser2_id] = useState(11);
     const [tmpMessages, settmpMessages] = useState([]);
+    const tmpMessagesRef = useRef([]);
+    tmpMessagesRef.current = tmpMessages;
     // console.log(chatId);
     useEffect(() => {
+        settmpMessages([]);
+
         axios
             .get("http://localhost:3001/chatDetails", {
                 params: {
@@ -32,19 +36,17 @@ export default function Chat() {
                         response2.data.user1_id === curId
                             ? setUser2_id(response2.data.user2_id)
                             : setUser2_id(response2.data.user1_id);
-                        // settmpMessages([]);
+                        socket.emit("join-room", chatId);
+                        console.log("joined room");
+                        console.log("changed id");
                     });
             });
-    });
-    socket.on(
-        "receive-message",
-        (msg) => {
+    }, [chatId]);
+    useEffect(() => {
+        socket.on("receive-message", (msg) => {
             receiveMessage(msg);
-            socket.emit("join-room", chatId);
-            console.log("joined room");
-        },
-        [chatId]
-    );
+        });
+    }, []);
     const sendMsg = () => {
         axios
             .post("http://localhost:3001/sendMessage", {
@@ -54,28 +56,21 @@ export default function Chat() {
                 content: message,
             })
             .then((response) => {
-                if (response.data === "err") console.log("message sent");
-                setMessage("");
+                if (response.data !== "err") {
+                    console.log("message sent");
+                    setMessage("");
+                    const sendedMessage = {
+                        chat: chatId,
+                        sender_id: curId,
+                        receiver_id: user2_id,
+                        content: message,
+                    };
+                    socket.emit("updateMessages", sendedMessage, chatId);
+                }
             });
-        const sendedMessage = {
-            chat: chatId,
-            sender_id: curId,
-            receiver_id: user2_id,
-            content: message,
-        };
-        console.log("before", tmpMessages);
-        settmpMessages([...tmpMessages, sendedMessage]);
-
-        socket.emit("updateMessages", sendedMessage, chatId);
     };
     const receiveMessage = (msg) => {
-        console.log(curId, msg.sender_id);
-        if (curId !== msg.sender_id) {
-            settmpMessages([...tmpMessages, msg]);
-            console.log("comparison was false");
-        } else {
-            console.log("comparison was true");
-        }
+        settmpMessages([...tmpMessagesRef.current, msg]);
     };
 
     return (

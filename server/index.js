@@ -1,5 +1,5 @@
 const express = require("express");
-const mysql = require("mysql");
+const mysql = require("mysql2");
 const cors = require("cors");
 const http = require("http");
 const app = express();
@@ -42,7 +42,9 @@ const db = mysql.createConnection({
     password: "root123",
     database: "chatapp",
 });
-
+// const db = mysql.createConnection(
+//     "mysql://root:VyFy1UKkIhNNnhKGRZ7N@containers-us-west-74.railway.app:6086/railway"
+// );
 app.post("/addUser", (req, res) => {
     console.log("got post request to /addUser");
     const username = req.body.username;

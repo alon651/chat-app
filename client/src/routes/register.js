@@ -37,9 +37,8 @@ export default function Register() {
                     })
                     .then((r) => {
                         setCurId(r.data);
+                        navigate("/chats");
                     });
-
-                navigate("/chats");
             });
     };
     return (

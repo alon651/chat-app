@@ -89,7 +89,11 @@ order the two divs nicely*/
 }
 .message {
     border: 1px black solid;
-    padding: 1.5%;
+    padding: 0% 1.5% 0% 1.5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
 }
 .sent {
     align-self: flex-end;
@@ -131,4 +135,8 @@ order the two divs nicely*/
 }
 .newchatForm {
     max-width: 20vw;
+}
+.timeStamp {
+    font-size: smaller;
+    text-decoration: underline;
 }

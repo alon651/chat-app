@@ -24,6 +24,7 @@ export default function Register() {
     };
     const submitInfo = () => {
         console.log(`user name:${userName} password: ${password}`);
+        // let enc_password =
         axios
             .post("http://localhost:3001/addUser", {
                 username: userName,

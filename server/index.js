@@ -191,7 +191,7 @@ app.get("/getUname", (req, res) => {
 app.get("/chatDetails", (req, res) => {
     const chatId = req.query.id;
     db.query(
-        "SELECT content,sender_id,receiver_id FROM message WHERE chat_id=?",
+        "SELECT content,sender_id,receiver_id,timeSt FROM message WHERE chat_id=?",
         [chatId],
         (err, result) => {
             console.log("aaa");
@@ -217,9 +217,10 @@ app.post("/sendMessage", (req, res) => {
     const sender = req.body.sender;
     const receiver = req.body.receiver;
     const content = req.body.content;
+    const timeSt = req.body.timeSt;
     db.query(
-        "INSERT INTO message (sender_id, receiver_id, content,  chat_id) VALUES (?,?,?,?)",
-        [sender, receiver, content, chat],
+        "INSERT INTO message (sender_id, receiver_id, content,  chat_id, timeSt) VALUES (?,?,?,?,?)",
+        [sender, receiver, content, chat, timeSt],
         (err, result) => {
             if (err) console.log(err);
             else {

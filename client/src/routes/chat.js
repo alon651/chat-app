@@ -4,7 +4,7 @@ import { userContext } from "../App";
 import axios from "axios";
 import socket from "../socket";
 import { v4 as uuidv4 } from "uuid";
-
+const moment = require("moment");
 export default function Chat() {
     const params = useParams();
     const chatId = params.chatId;
@@ -48,12 +48,14 @@ export default function Chat() {
         });
     }, []);
     const sendMsg = () => {
+        if (message === "") return;
         axios
             .post("http://localhost:3001/sendMessage", {
                 chat: chatId,
                 sender: curId,
                 receiver: user2_id,
                 content: message,
+                timeSt: moment().format("YYYY-MM-DD HH:mm:ss"),
             })
             .then((response) => {
                 if (response.data !== "err") {
@@ -64,6 +66,7 @@ export default function Chat() {
                         sender_id: curId,
                         receiver_id: user2_id,
                         content: message,
+                        timeSt: moment().format("YYYY-MM-DD HH:mm:ss"),
                     };
                     socket.emit("updateMessages", sendedMessage, chatId);
                 }
@@ -85,6 +88,9 @@ export default function Chat() {
                                 : "message received"
                         }
                     >
+                        <div className="timeStamp">
+                            {r.timeSt.replace("T", " ").replace("Z", "")}
+                        </div>
                         {r.content}
                     </div>
                 ))}
@@ -97,6 +103,9 @@ export default function Chat() {
                                 : "message received"
                         }
                     >
+                        <div className="timeStamp">
+                            {r.timeSt.replace("T", " ").replace("Z", "")}
+                        </div>
                         {r.content}
                     </div>
                 ))}

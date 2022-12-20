@@ -4,6 +4,9 @@ import "../styles/login.css";
 import { userContext } from "../App.js";
 import { Link, redirect, useNavigate } from "react-router-dom";
 import socket from "../socket";
+import { SHA256 } from "crypto-js";
+// import {} from "crypto-js"
+
 export default function Login() {
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
@@ -12,9 +15,10 @@ export default function Login() {
     const navigate = useNavigate();
     // console.log(curUser);
     const logIn = () => {
+        let enc_password = SHA256(password + userName).toString();
         axios
             .get("http://localhost:3001/verifyLogin", {
-                params: { username: userName, password: password },
+                params: { username: userName, password: enc_password },
             })
             .then((response) => {
                 console.log(response.data);

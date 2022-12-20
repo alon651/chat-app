@@ -3,7 +3,7 @@ import { useContext, useState } from "react";
 import axios from "axios";
 import { userContext } from "../App.js";
 import { useNavigate } from "react-router-dom";
-
+import { SHA256 } from "crypto-js";
 export default function Register() {
     const [curId, setCurId] = useContext(userContext);
     const navigate = useNavigate();
@@ -24,11 +24,12 @@ export default function Register() {
     };
     const submitInfo = () => {
         console.log(`user name:${userName} password: ${password}`);
-        // let enc_password =
+        let enc_password = SHA256(password + userName).toString();
+        console.log(`enc: ${enc_password}`);
         axios
             .post("http://localhost:3001/addUser", {
                 username: userName,
-                password: password,
+                password: enc_password,
             })
             // .then(console.log(`user - ${userName} was registered`));
             .then(() => {

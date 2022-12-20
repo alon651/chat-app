@@ -4,6 +4,7 @@ import { userContext } from "../App";
 import axios from "axios";
 import socket from "../socket";
 import { v4 as uuidv4 } from "uuid";
+var forge = require("node-forge");
 const moment = require("moment");
 export default function Chat() {
     const params = useParams();
@@ -18,7 +19,6 @@ export default function Chat() {
     // console.log(chatId);
     useEffect(() => {
         settmpMessages([]);
-
         axios
             .get("http://localhost:3001/chatDetails", {
                 params: {
@@ -49,6 +49,15 @@ export default function Chat() {
     }, []);
     const sendMsg = () => {
         if (message === "") return;
+        console.log(
+            JSON.stringify({
+                chat: chatId,
+                sender: curId,
+                receiver: user2_id,
+                content: message,
+                timeSt: moment().format("YYYY-MM-DD HH:mm:ss"),
+            })
+        );
         axios
             .post("http://localhost:3001/sendMessage", {
                 chat: chatId,

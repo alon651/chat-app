@@ -3,7 +3,7 @@ import { useContext, useState } from "react";
 import axios from "axios";
 import { userContext } from "../App.js";
 import { useNavigate } from "react-router-dom";
-import { hash } from "../cryptography";
+import { encrypt, hash } from "../cryptography";
 export default function Register() {
     const [curId, setCurId] = useContext(userContext);
     const navigate = useNavigate();
@@ -21,6 +21,16 @@ export default function Register() {
                     console.log("error");
                 }
             });
+    };
+    const en = () => {
+        encrypt(
+            JSON.stringify({
+                chat: 12,
+                sender: curId,
+                receiver: 50,
+                content: "hello",
+            })
+        );
     };
     const submitInfo = () => {
         console.log(`user name:${userName} password: ${password}`);
@@ -58,6 +68,7 @@ export default function Register() {
                     onChange={(e) => setPassword(e.target.value)}
                 />
                 <button onClick={submitBtn}>sign up</button>
+                <button onClick={en}>test crypto</button>
             </div>
         </div>
     );

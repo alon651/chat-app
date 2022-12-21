@@ -49,15 +49,6 @@ export default function Chat() {
     }, []);
     const sendMsg = () => {
         if (message === "") return;
-        console.log(
-            JSON.stringify({
-                chat: chatId,
-                sender: curId,
-                receiver: user2_id,
-                content: message,
-                timeSt: moment().format("YYYY-MM-DD HH:mm:ss"),
-            })
-        );
         axios
             .post("http://localhost:3001/sendMessage", {
                 chat: chatId,

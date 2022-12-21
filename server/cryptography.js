@@ -3,12 +3,12 @@ const forge = require("node-forge");
 const key = "sKfjZqhxy4yX22xT";
 const iv = "djLLZ0rI1waRfdtO";
 // decrypt and encrypt uses constant hardcoded key and iv for simplicity sake
-export function hash(input) {
+function hash(input) {
     const md = forge.md.sha256.create();
     md.update(input);
     return md.digest().toHex();
 }
-export function encrypt(input) {
+function encrypt(input) {
     var cipher = forge.cipher.createCipher("AES-CBC", key);
     cipher.start({ iv: iv });
     cipher.update(forge.util.createBuffer(input));
@@ -20,9 +20,11 @@ export function encrypt(input) {
     return res;
 }
 function decrypt(encrypted) {
+    enc = forge.util.createBuffer(forge.util.hexToBytes(encrypted), "raw");
     var decipher = forge.cipher.createDecipher("AES-CBC", key);
     decipher.start({ iv: iv });
-    decipher.update(encrypted);
+    decipher.update(enc);
     var result = decipher.finish(); // check 'result' for true/false
     return JSON.parse(decipher.output.toString());
 }
+module.exports = { hash, decrypt, encrypt };

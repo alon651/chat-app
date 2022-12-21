@@ -6,6 +6,7 @@ const app = express();
 const server = http.createServer(app);
 app.use(cors());
 app.use(express.json());
+const cryptography = require("./cryptography");
 
 server.listen(3001, () => console.log("running on port 3001"));
 const { Server } = require("socket.io");
@@ -213,11 +214,15 @@ app.get("/usersInChat", (req, res) => {
     );
 });
 app.post("/sendMessage", (req, res) => {
-    const chat = req.body.chat;
-    const sender = req.body.sender;
-    const receiver = req.body.receiver;
-    const content = req.body.content;
-    const timeSt = req.body.timeSt;
+    encryptedMSG = req.body.data;
+    const msg = cryptography.decrypt(encryptedMSG);
+    console.log(msg);
+    // message = JSON.parse(encryptedMSG);
+    const chat = msg.chat;
+    const sender = msg.sender;
+    const receiver = msg.receiver;
+    const content = msg.content;
+    const timeSt = msg.timeSt;
     db.query(
         "INSERT INTO message (sender_id, receiver_id, content,  chat_id, timeSt) VALUES (?,?,?,?,?)",
         [sender, receiver, content, chat, timeSt],

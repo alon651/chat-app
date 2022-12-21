@@ -4,6 +4,7 @@ import { userContext } from "../App";
 import axios from "axios";
 import socket from "../socket";
 import { v4 as uuidv4 } from "uuid";
+import { encrypt } from "../cryptography";
 var forge = require("node-forge");
 const moment = require("moment");
 export default function Chat() {
@@ -49,14 +50,19 @@ export default function Chat() {
     }, []);
     const sendMsg = () => {
         if (message === "") return;
+        const msg = JSON.stringify({
+            chat: chatId,
+            sender: curId,
+            receiver: user2_id,
+            content: message,
+            timeSt: moment().format("YYYY-MM-DD HH:mm:ss"),
+        });
+
+        console.log(encrypt(msg));
+        const encMsg = encrypt(msg);
+
         axios
-            .post("http://localhost:3001/sendMessage", {
-                chat: chatId,
-                sender: curId,
-                receiver: user2_id,
-                content: message,
-                timeSt: moment().format("YYYY-MM-DD HH:mm:ss"),
-            })
+            .post("http://localhost:3001/sendMessage", { data: encMsg })
             .then((response) => {
                 if (response.data !== "err") {
                     console.log("message sent");

@@ -22,16 +22,6 @@ export default function Register() {
                 }
             });
     };
-    const en = () => {
-        encrypt(
-            JSON.stringify({
-                chat: 12,
-                sender: curId,
-                receiver: 50,
-                content: "hello",
-            })
-        );
-    };
     const submitInfo = () => {
         console.log(`user name:${userName} password: ${password}`);
         let enc_password = hash(password + userName).toString();
@@ -68,7 +58,6 @@ export default function Register() {
                     onChange={(e) => setPassword(e.target.value)}
                 />
                 <button onClick={submitBtn}>sign up</button>
-                <button onClick={en}>test crypto</button>
             </div>
         </div>
     );

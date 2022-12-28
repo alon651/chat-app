@@ -19,10 +19,11 @@ export function encrypt(input) {
     console.log(decrypt(encrypted));
     return res;
 }
-function decrypt(encrypted) {
+export function decrypt(encrypted) {
+    let enc = forge.util.createBuffer(forge.util.hexToBytes(encrypted), "raw");
     var decipher = forge.cipher.createDecipher("AES-CBC", key);
     decipher.start({ iv: iv });
-    decipher.update(encrypted);
+    decipher.update(enc);
     var result = decipher.finish(); // check 'result' for true/false
-    return JSON.parse(decipher.output.toString());
+    return decipher.output.toString();
 }

@@ -20,7 +20,7 @@ function encrypt(input) {
     return res;
 }
 function decrypt(encrypted) {
-    enc = forge.util.createBuffer(forge.util.hexToBytes(encrypted), "raw");
+    let enc = forge.util.createBuffer(forge.util.hexToBytes(encrypted), "raw");
     var decipher = forge.cipher.createDecipher("AES-CBC", key);
     decipher.start({ iv: iv });
     decipher.update(enc);

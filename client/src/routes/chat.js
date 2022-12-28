@@ -4,7 +4,7 @@ import { userContext } from "../App";
 import axios from "axios";
 import socket from "../socket";
 import { v4 as uuidv4 } from "uuid";
-import { encrypt } from "../cryptography";
+import { decrypt, encrypt } from "../cryptography";
 var forge = require("node-forge");
 const moment = require("moment");
 export default function Chat() {
@@ -45,6 +45,7 @@ export default function Chat() {
     }, [chatId]);
     useEffect(() => {
         socket.on("receive-message", (msg) => {
+            let newMsg = encrypt(msg);
             receiveMessage(msg);
         });
     }, []);
@@ -74,12 +75,16 @@ export default function Chat() {
                         content: message,
                         timeSt: moment().format("YYYY-MM-DD HH:mm:ss"),
                     };
-                    socket.emit("updateMessages", sendedMessage, chatId);
+                    socket.emit("updateMessages", { data: encMsg });
                 }
             });
     };
     const receiveMessage = (msg) => {
-        settmpMessages([...tmpMessagesRef.current, msg]);
+        let encMsg = decrypt(msg.data);
+        let encMsgJson = JSON.parse(encMsg);
+        console.log("sended msg::");
+        console.log(encMsgJson);
+        settmpMessages([...tmpMessagesRef.current, encMsgJson]);
     };
 
     return (
@@ -104,7 +109,7 @@ export default function Chat() {
                     <div
                         key={uuidv4()}
                         className={
-                            r.sender_id === curId
+                            r.sender === curId
                                 ? "message sent"
                                 : "message received"
                         }

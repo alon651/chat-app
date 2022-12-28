@@ -20,7 +20,11 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
     console.log("a user connected");
 
-    socket.on("updateMessages", (message, chatId) => {
+    socket.on("updateMessages", (message) => {
+        deMsg = cryptography.decrypt(message.data);
+        chatId = deMsg.chat;
+        console.log("sended message: ");
+        console.log(message);
         socket.to(chatId).emit("receive-message", message);
     });
 
@@ -36,7 +40,7 @@ io.on("connection", (socket) => {
         socket.emit("print", socket.rooms);
     });
 });
-
+    
 const db = mysql.createConnection({
     user: "root",
     host: "localhost",
@@ -217,7 +221,6 @@ app.post("/sendMessage", (req, res) => {
     encryptedMSG = req.body.data;
     const msg = cryptography.decrypt(encryptedMSG);
     console.log(msg);
-    // message = JSON.parse(encryptedMSG);
     const chat = msg.chat;
     const sender = msg.sender;
     const receiver = msg.receiver;

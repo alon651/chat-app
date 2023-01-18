@@ -4,9 +4,13 @@ A fullstack real time encrypted chat application written in javascript using Rea
 - node js installed on your computer
 - mysql installed on your computer
 ## database setup
-### run the following mysql commands
-`CREATE DATABASE chatapp `
- `USE chatapp`
+ run the following mysql commands
+ ```
+ CREATE DATABASE chatapp 
+ ```
+  ```
+ USE chatapp
+  ```
   ```
   CREATE TABLE `users` (
   `id` int NOT NULL AUTO_INCREMENT,

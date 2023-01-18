@@ -33,7 +33,6 @@ function App() {
     } else {
         userMsg = (
             <div className="userBtn">
-                hello user number {curId}
                 <div onClick={logout}>logout</div>
             </div>
         );
@@ -42,9 +41,9 @@ function App() {
         <userContext.Provider value={value}>
             <div className="App">
                 <header className="headerBar">
-                    <Link to="/" className="logo">
+                    <div className="logo">
                         logo
-                    </Link>
+                    </div>
                     {userMsg}
                 </header>
                 <Outlet />

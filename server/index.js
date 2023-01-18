@@ -18,29 +18,42 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-    console.log("a user connected");
+    //console.log("a user connected");
 
     socket.on("updateMessages", (message) => {
         deMsg = cryptography.decrypt(message.data);
         chatId = deMsg.chat;
-        console.log("sended message: ");
-        console.log(message);
-        socket.to(chatId).emit("receive-message", message);
+        //console.log("sended message: ");
+        ////console.log(message);
+        socket.to("C" + chatId).emit("receive-message", message);
     });
 
     socket.on("join-room", (room) => {
         // [...socket.rooms].map((r) => socket.leave(r));
         // if (socket.rooms.size > 1)
         //     socket.leave([...socket.rooms][socket.rooms.size - 1]);
-        socket.leave([...socket.rooms][socket.rooms.size - 1]);
-        socket.join(room);
-        console.log("rooms ", socket.rooms);
+        [
+            ...[...socket.rooms].filter((element) => element.startsWith("C")),
+        ].forEach((element) => socket.leave(element));
+
+        socket.join("C" + room);
+        //console.log("rooms ", socket.rooms);
     });
     socket.on("get-rooms", () => {
         socket.emit("print", socket.rooms);
     });
+
+    socket.on("join-notification-room", (chat_id) => {
+        let roomStr = "N" + chat_id;
+        socket.join(roomStr);
+    });
+
+    socket.on("notify-chat", (chat_id) => {
+        let roomStr = "N" + chat_id;
+        socket.to(roomStr).emit("trigger-notification", chat_id);
+    });
 });
-    
+
 const db = mysql.createConnection({
     user: "root",
     host: "localhost",
@@ -51,7 +64,7 @@ const db = mysql.createConnection({
 //     "mysql://root:VyFy1UKkIhNNnhKGRZ7N@containers-us-west-74.railway.app:6086/railway"
 // );
 app.post("/addUser", (req, res) => {
-    console.log("got post request to /addUser");
+    //console.log("got post request to /addUser");
     const username = req.body.username;
     const password = req.body.password;
 
@@ -60,7 +73,7 @@ app.post("/addUser", (req, res) => {
         [username, password],
         (err, result) => {
             if (err) {
-                console.log(err);
+                res.send("failure");
             } else {
                 res.send("success");
             }
@@ -70,13 +83,13 @@ app.post("/addUser", (req, res) => {
 
 app.get("/countByUserName", (req, res) => {
     const username = req.query.username;
-    console.log(username);
+    //console.log(username);
     db.query(
         "SELECT COUNT(username) AS nameCount FROM users WHERE username=?",
         [username],
         (err, result) => {
             if (err) {
-                console.log(err);
+                //console.log(err);
             } else {
                 res.send(result);
             }
@@ -92,14 +105,14 @@ app.get("/verifyLogin", (req, res) => {
         [username],
         (err, result) => {
             if (err) {
-                console.log(err);
+                //console.log(err);
             } else {
                 if (password === result[0].password) {
                     res.send(String(result[0].id));
                 } else {
                     res.send("failure");
                 }
-                console.log(result[0].password);
+                //console.log(result[0].password);
             }
         }
     );
@@ -121,12 +134,12 @@ function insertChat(user1, user2, res) {
 app.post("/addChat", (req, res) => {
     const user1 = req.body.user1;
     const user2 = req.body.user2;
-    console.log(`chat created between ${user1} and ${user2}`);
+    //console.log(`chat created between ${user1} and ${user2}`);
     const sqlQuery =
         "SELECT COUNT(id) AS ChatCount FROM chat WHERE (user1_id=? AND user2_id=?) OR  (user1_id=? AND user2_id=?)";
     db.query(sqlQuery, [user1, user2, user2, user1], (err, result) => {
         if (err) {
-            console.log(err);
+            //console.log(err);
         } else {
             result[0].ChatCount === 0
                 ? insertChat(user1, user2, res)
@@ -151,10 +164,10 @@ app.get("/allChats", (req, res) => {
         [user, user],
         (err, result) => {
             if (err) {
-                console.log(err);
+                //console.log(err);
                 res.send("err");
             } else {
-                console.log(result);
+                //console.log(result);
                 res.send({ result });
             }
         }
@@ -162,18 +175,18 @@ app.get("/allChats", (req, res) => {
 });
 app.get("/getId", (req, res) => {
     const username = req.query.username;
-    console.log(username);
+    //console.log(username);
     db.query(
         "SELECT id FROM users WHERE username=?",
         [username],
         (err, result) => {
             if (err) {
-                console.log(err);
+                //console.log(err);
                 res.send("error");
             } else {
                 if (result[0] != undefined) {
-                    console.log("getId result");
-                    console.log(result[0]);
+                    //console.log("getId result");
+                    //console.log(result[0]);
                     res.send(String(result[0].id));
                 } else {
                     res.send("no results");
@@ -187,7 +200,7 @@ app.get("/getUname", (req, res) => {
     const id = req.query.id;
     db.query("SELECT username FROM users WHERE id=?", [id], (err, result) => {
         if (err) {
-            console.log(err);
+            //console.log(err);
         } else {
             res.send(String(result[0].username));
         }
@@ -199,8 +212,6 @@ app.get("/chatDetails", (req, res) => {
         "SELECT content,sender_id,receiver_id,timeSt FROM message WHERE chat_id=?",
         [chatId],
         (err, result) => {
-            console.log("aaa");
-            console.log(result);
             res.send(result);
         }
     );
@@ -211,8 +222,6 @@ app.get("/usersInChat", (req, res) => {
         "SELECT user1_id,user2_id From chat WHERE id=?",
         [chatId],
         (err, result) => {
-            console.log("users in chat");
-            console.log(result);
             res.send(result[0]);
         }
     );
@@ -220,7 +229,6 @@ app.get("/usersInChat", (req, res) => {
 app.post("/sendMessage", (req, res) => {
     encryptedMSG = req.body.data;
     const msg = cryptography.decrypt(encryptedMSG);
-    console.log(msg);
     const chat = msg.chat;
     const sender = msg.sender;
     const receiver = msg.receiver;
@@ -232,7 +240,7 @@ app.post("/sendMessage", (req, res) => {
         (err, result) => {
             if (err) console.log(err);
             else {
-                console.log("message sent");
+                //console.log("message sent");
                 res.send("success");
             }
         }

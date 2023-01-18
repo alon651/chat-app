@@ -27,4 +27,5 @@ function decrypt(encrypted) {
     var result = decipher.finish(); // check 'result' for true/false
     return JSON.parse(decipher.output.toString());
 }
+
 module.exports = { hash, decrypt, encrypt };

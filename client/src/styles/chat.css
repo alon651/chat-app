@@ -52,14 +52,24 @@ order the two divs nicely*/
     overflow-x: hidden;
     max-height: 100%;
     gap: 0;
+    width: 20vw;
 }
 
 .singleChatContainer {
     border: 1px solid black;
     padding: 4% 7% 4% 7%;
+    box-sizing: border-box;
     width: 20vw;
     cursor: pointer;
+    display: flex;
+    justify-content: space-between;
 }
+
+.notification {
+    font-size: smaller;
+    text-decoration: underline;
+}
+
 .singleChatContainer:hover {
     background-color: royalblue;
     transition-duration: 0.5s;

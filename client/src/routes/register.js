@@ -9,6 +9,7 @@ export default function Register() {
     const navigate = useNavigate();
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
+    const [registerErr, setRegisterErr] = useState(false);
     const submitBtn = () => {
         axios
             .get("http://localhost:3001/countByUserName", {
@@ -18,7 +19,7 @@ export default function Register() {
                 if (response.data[0].nameCount === 0) {
                     submitInfo();
                 } else {
-                    console.log("error");
+                    setRegisterErr(true);
                 }
             });
     };
@@ -32,7 +33,7 @@ export default function Register() {
                 password: enc_password,
             })
             // .then(console.log(`user - ${userName} was registered`));
-            .then(() => {
+            .then((response) => {
                 axios
                     .get("http://localhost:3001/getId", {
                         params: { username: userName },
@@ -47,6 +48,9 @@ export default function Register() {
         <div className="registerScreen">
             <div className="registerForm">
                 <h1>Register</h1>
+                <h2 className={`errorMsg ${registerErr ? "displayed" : ""}`}>
+                    username already exist, please pick another one
+                </h2>
                 <label>user name:</label>
                 <input
                     type="text"
@@ -57,7 +61,7 @@ export default function Register() {
                     type="password"
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <button onClick={submitBtn}>sign up</button>
+                <button onClick={submitBtn}>register</button>
             </div>
         </div>
     );

@@ -2,15 +2,18 @@ import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { userContext } from "../App";
-import "../styles/newChatComponent.css";
+import socket from "../socket";
+import "../styles/chat.css";
 export default function ChatAddForm() {
     const navigate = useNavigate();
-
+    const [newMsgArray, setNewMsgArray] = useState([0]);
     const [chats, setChats] = useState([]);
     const [username, setUserName] = useState("");
     const [curId, setCurId] = useContext(userContext);
     const [selectedId, setSelectedId] = useState(-1);
-    let i = 0;
+
+    const [TestValue, setTestValue] = useState(0);
+
     const newChat = () => {
         axios
             .get("http://localhost:3001/getId", {
@@ -55,11 +58,19 @@ export default function ChatAddForm() {
                     params: { user: curId },
                 })
                 .then((response) => {
-                    // response.data.result.map((r) => console.log(`chat:${r}\n`));
-                    // if(response.data)
-                    // console.log(response.data.result);
+                    console.log(response.data.result);
                     setChats(response.data.result);
+                    response.data.result.map((r) => {
+                        if (selectedId !== r.chat_id)
+                            socket.emit("join-notification-room", r.chat_id);
+                        console.log(r.chat_id);
+                    });
+                    // console.log(newMsgArray);
                 });
+        socket.on("trigger-notification", (chat_id) => {
+            if (selectedId !== parseInt(chat_id))
+                setNewMsgArray([...newMsgArray, parseInt(chat_id)]);
+        });
     }, []);
     return (
         <div className="container">
@@ -74,11 +85,22 @@ export default function ChatAddForm() {
                                     : "singleChatContainer"
                             }
                             onClick={() => {
-                                navigate(`${r.chat_id}`);
                                 setSelectedId(r.chat_id);
+                                setNewMsgArray(
+                                    newMsgArray.filter(
+                                        (item) => item !== r.chat_id
+                                    )
+                                );
+                                console.log("removed");
+                                navigate(`${r.chat_id}`);
                             }}
                         >
                             chat with {r.otherUser}
+                            {newMsgArray.includes(r.chat_id) ? (
+                                <div className="notification">new messages</div>
+                            ) : (
+                                <div className="notification"></div>
+                            )}
                         </div>
                     ))}
                     <div className="newchatForm">

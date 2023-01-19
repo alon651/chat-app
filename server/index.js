@@ -12,7 +12,7 @@ server.listen(3001, () => console.log("running on port 3001"));
 const { Server } = require("socket.io");
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: "http://localhost:3000", //if you change your frontend url enter it here
         credentials: true,
     },
 });
@@ -53,12 +53,12 @@ io.on("connection", (socket) => {
         socket.to(roomStr).emit("trigger-notification", chat_id);
     });
 });
-
+//add relevant details below
 const db = mysql.createConnection({
-    user: "root",
-    host: "localhost",
-    password: "root123",
-    database: "chatapp",
+    user: "root", // write your mysql user here
+    host: "localhost", //write your host name here
+    password: "root123", //write your password here
+    database: "chatapp", //write your database name here
 });
 // const db = mysql.createConnection(
 //     "mysql://root:VyFy1UKkIhNNnhKGRZ7N@containers-us-west-74.railway.app:6086/railway"

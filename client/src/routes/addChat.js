@@ -22,30 +22,32 @@ export default function ChatAddForm() {
             .then((r) => {
                 if (r.data != "no results") {
                     const id2 = r.data;
-                    axios
-                        .post("http://localhost:3001/addChat", {
-                            user1: curId,
-                            user2: id2,
-                        })
-                        .then((response) => {
-                            if (response.data === "success") {
-                                // console.log("chat Created");
-                                axios
-                                    .get("http://localhost:3001/allChats", {
-                                        params: { user: curId },
-                                    })
-                                    .then((response2) => {
-                                        // response.data.result.map((r) => console.log(`chat:${r}\n`));
-                                        // console.log(response.data.result);
-                                        setChats(response2.data.result);
-                                    });
-                            } else {
-                                if ((response.data = "error")) {
-                                    console.log("user couldn't be found");
+                    if (curId !== id2) {
+                        axios
+                            .post("http://localhost:3001/addChat", {
+                                user1: curId,
+                                user2: id2,
+                            })
+                            .then((response) => {
+                                if (response.data === "success") {
+                                    // console.log("chat Created");
+                                    axios
+                                        .get("http://localhost:3001/allChats", {
+                                            params: { user: curId },
+                                        })
+                                        .then((response2) => {
+                                            // response.data.result.map((r) => console.log(`chat:${r}\n`));
+                                            // console.log(response.data.result);
+                                            setChats(response2.data.result);
+                                        });
+                                } else {
+                                    if ((response.data = "error")) {
+                                        console.log("user couldn't be found");
+                                    }
                                 }
-                            }
-                            // console.log(response.data);
-                        });
+                                // console.log(response.data);
+                            });
+                    }
                 }
             });
     };

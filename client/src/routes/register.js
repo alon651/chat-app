@@ -4,6 +4,8 @@ import axios from "axios";
 import { userContext } from "../App.js";
 import { useNavigate } from "react-router-dom";
 import { encrypt, hash } from "../cryptography";
+import socket from "../socket";
+
 export default function Register() {
     const [curId, setCurId] = useContext(userContext);
     const navigate = useNavigate();
@@ -40,6 +42,8 @@ export default function Register() {
                     })
                     .then((r) => {
                         setCurId(r.data);
+                        socket.auth = { curId };
+                        socket.connect();
                         navigate("/chats");
                     });
             });
